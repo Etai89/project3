@@ -3,10 +3,10 @@ services:
     image: mysql:latest
     container_name: project3
     environment:
-      MYSQL_ROOT_PASSWORD: et151579799090
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: Etai1989
-      MYSQL_PASSWORD: et151579799090
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3206:3306"
     volumes:
@@ -34,7 +34,6 @@ services:
     depends_on:
       - db
     command: sh -c "npm install && npm run dev"
-
 
 volumes:
   mysql_data:
