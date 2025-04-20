@@ -16,15 +16,19 @@ const express_1 = __importDefault(require("express"));
 const promise_1 = __importDefault(require("mysql2/promise"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
+const dotenv_1 = __importDefault(require("dotenv"));
+// routes imports
+const testRoute_1 = __importDefault(require("./routes/testRoute"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = 3005;
+const port = process.env.PORT;
 app.use(body_parser_1.default.json());
 app.use((0, cors_1.default)());
 const dbConfig = {
-    host: 'db',
-    user: 'root',
-    password: 'rootpassword',
-    database: 'mydatabase',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 };
 let db;
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,6 +67,10 @@ const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 connectDB();
+app.get('/', (req, res) => {
+    res.json("Wellcome to 'enter' route!");
+});
+app.use('/enter', testRoute_1.default);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

@@ -2,20 +2,24 @@ import express, { Request, Response } from 'express';
 import mysql from 'mysql2/promise';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import dotenv from 'dotenv'
 
+// routes imports
+import TestRoute from './routes/testRoute';
 
+dotenv.config()
 
 const app = express();
-const port = 3005;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 app.use(cors());
 
 const dbConfig = {
-    host: 'db',
-    user: 'root',
-    password: 'rootpassword',
-    database: 'mydatabase',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 };
 
 let db: mysql.Connection;
@@ -60,8 +64,13 @@ const connectDB = async () => {
 };
 
 connectDB();
+app.get('/', (req: Request, res: Response)=>{
+
+    res.json("Wellcome to 'enter' route!")
+})
 
 
+app.use('/enter', TestRoute)
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
