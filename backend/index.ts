@@ -24,10 +24,14 @@ const app = express()
 const port = process.env.PORT || 5000
 
 app.use(bodyParser.json())
+
 app.use(cors({
   origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   credentials: true
 }))
+
 app.use('/uploads', express.static('uploads'))
 
 
