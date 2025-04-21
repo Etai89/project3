@@ -1,77 +1,58 @@
-import express, { Request, Response } from 'express';
-import mysql from 'mysql2/promise';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import dotenv from 'dotenv'
+/// <reference path="./types/express.d.ts" />
 
-// routes imports
-import TestRoute from './routes/testRoute';
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { initDB } from './config/db'
+
+// routes
+import AuthRoute from './routes/authRoutes/authRoutes'
+import CreateVacationRoute from './routes/vacationsRoutes/createNewVacationRoute'
+import GetVacationsRoute from './routes/vacationsRoutes/getAllVacationsRoute'
+import UpdateVacationRoute from './routes/vacationsRoutes/updateVacationRoute'
+import DeleteVacationRoute from './routes/vacationsRoutes/deleteVacationroute'
+import CreateFollowerRoute from './routes/followerRoutes/createNewFollowerRoute'
+import RemoveFollowerRoute from './routes/followerRoutes/removeFollowerRoute'
+import GetFollowerQuantityRoute from './routes/followerRoutes/getFollowerQuantityRoute'
+import GetFollowedVacationsRoute from './routes/followerRoutes/getFollowedVacationsRoute'
+import ReportRoute from './routes/reports/reportRoute'
 
 dotenv.config()
 
-const app = express();
-const port = process.env.PORT;
+const app = express()
+const port = process.env.PORT || 5000
 
-app.use(bodyParser.json());
-app.use(cors());
+app.use(bodyParser.json())
+app.use(cors())
+app.use('/uploads', express.static('uploads'))
 
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-};
 
-let db: mysql.Connection;
+// Init DB
+initDB()
 
-const connectDB = async () => {
-    try {
-        db = await mysql.createConnection(dbConfig);
-        console.log('Connected to MySQL database');
+// Routes
+app.use('/auth', AuthRoute)
+app.use('/api', CreateVacationRoute)
+app.use('/api', GetVacationsRoute)
+app.use('/api', UpdateVacationRoute)
+app.use('/api', DeleteVacationRoute)
+app.use('/api', CreateFollowerRoute)
+app.use('/api', RemoveFollowerRoute)
+app.use('/api', GetFollowerQuantityRoute)
+app.use('/api', GetFollowedVacationsRoute)
+app.use('/api', ReportRoute)
 
-        // Create the buildings table
-        await db.execute(`
-            CREATE TABLE IF NOT EXISTS buildings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                building_name VARCHAR(255) NOT NULL
-            )
-        `);
-
-        // Create the rooms table
-        await db.execute(`
-            CREATE TABLE IF NOT EXISTS rooms (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                building_id INT NOT NULL,
-                room_name TEXT
-            )
-        `);
-
-        // Create the bookings table
-        await db.execute(`
-            CREATE TABLE IF NOT EXISTS bookings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                room_id INT NOT NULL,
-                startDate DATETIME NOT NULL,
-                endDate DATETIME NOT NULL,
-                description TEXT
-            )
-        `);
-
-        console.log('Database setup complete');
-    } catch (err) {
-        console.error('Error connecting to MySQL:', err);
-    }
-};
-
-connectDB();
-app.get('/', (req: Request, res: Response)=>{
-
-    res.json("Wellcome to 'enter' route!")
+// Health check
+app.get('/check', (req, res) => {
+  res.send('Server OK')
 })
 
+// Don't run server in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`)
+  })
+}
 
-app.use('/enter', TestRoute)
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+export default app
