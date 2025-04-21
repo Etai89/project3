@@ -29,7 +29,6 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ./uploads:/usr/src/app/uploads
     ports:
       - "3006:3006"
     depends_on:
